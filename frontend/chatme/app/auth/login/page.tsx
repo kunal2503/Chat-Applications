@@ -1,55 +1,114 @@
-"use client"
+"use client";
 
 import React, { ChangeEvent, FormEvent } from "react";
-import Navigate from "next/navigation";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Password from "@/components/chat/password";
+import { MessageCircle } from "lucide-react";
 
-const Login = () =>{
-    const [userData, setUserData] = React.useState({
-        email : "",
-        password : ""
-    });
-    const navigate = Navigate;
+const Login = () => {
+  const router = useRouter();
 
-    const handleChanges = (e : ChangeEvent<HTMLInputElement>)=>{
-        setUserData({...userData , [e.target.id] : e.target.value})
-    };
+  const [userData, setUserData] = React.useState({
+    email: "",
+    password: "",
+  });
 
-    const handleLogin = async(e : FormEvent<HTMLFormElement>)=>{
-        e.preventDefault();
-        try{
-            const response = await fetch("http://localhost:5000/api/user/profile",{
-                method : "GET",
-                credentials : "include",
-                 headers :{
-               "Content-Type" : "application/json"
-            },
-            
-        })
-        const data = await response.json();
-        console.log(data);
-        
-        
-        } catch(error){
-            console.log(error);
-        }
+  const handleChanges = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserData({ ...userData, [e.target.id]: e.target.value });
+  };
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/v1/login", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        router.push("/chat");
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    return (
-       <div className="flex items-center justify-center flex-col border border-gray-300 px-6 py-4">
-        <h1 className="text-2xl font-bold">Login</h1>
-        <form className="flex items-center justify-center flex-col mt-4 space-y-4">
-            <div className="flex flex-col ">
-            <label htmlFor="email"  className="font-light">Email</label>
-            <input type="email" id="email" value={userData.email} onChange={handleChanges} placeholder="Enter a Email" className="border  border-gray-800 outline-none px-6 py-2 focus:border-2" />
+  return (
+    <div className="min-h-screen flex items-center justify-center  px-4">
+
+      <div className="w-full max-w-sm">
+
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 mx-auto flex items-center justify-center bg-emerald-500 rounded-xl">
+            <MessageCircle className="w-7 h-7 text-white" />
+          </div>
+          <h1 className="mt-4 text-2xl font-semibold text-gray-900">
+            Welcome back
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Sign in to your account
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+
+          <form onSubmit={handleLogin} className="space-y-5">
+
+            {/* Email */}
+            <div>
+              <label className="text-sm text-gray-600">Email</label>
+              <input
+                type="email"
+                id="email"
+                value={userData.email}
+                onChange={handleChanges}
+                required
+                placeholder="you@example.com"
+                className="mt-1 w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition"
+              />
             </div>
-            <div className="flex flex-col ">
-            <label htmlFor="password" className="font-light">Password</label>
-            <input type="password" id="password"  value={userData.password} onChange={handleChanges} placeholder="Enter a Password" className="border border-gray-800 outline-none px-6 py-2 focus:border-2" />
+
+            {/* Password */}
+            <div>
+              <label className="text-sm text-gray-600">Password</label>
+              <div className="mt-1">
+                <Password
+                  value={userData.password}
+                  onChange={handleChanges}
+                />
+              </div>
             </div>
-            <button onClick={handleLogin} className="bg-blue-500 hover:bg-blue-600 focus:border-2 focus:border-blue-300 px-6 py-2 font-bold rounded-sm">Login</button>
-        </form>
-       </div>
-    )
-}
+
+            {/* Button */}
+            <button
+              type="submit"
+              className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition"
+            >
+              Sign In
+            </button>
+          </form>
+
+          {/* Register */}
+          <p className="mt-6 text-center text-sm text-gray-500">
+            Don’t have an account?{" "}
+            <Link
+              href="/auth/register"
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
+            >
+              Create one
+            </Link>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Login;
