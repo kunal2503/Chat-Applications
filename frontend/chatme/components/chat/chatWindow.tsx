@@ -57,11 +57,11 @@ export default function ChatWindow({ user, onBack }: ChatWindowProps) {
           </button>
         )}
 
-        <div className="flex items-center gap-4 flex-1">
+        <div className="flex items-center gap-4 ">
           <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
             {user.initials}
           </div>
-          <div>
+          <div className="flex flex-col gap-0">
             <h2 className="text-lg font-semibold text-gray-900">{user.name}</h2>
             <p className="text-sm text-gray-500">{user.status}</p>
           </div>
