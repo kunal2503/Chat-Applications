@@ -1,47 +1,38 @@
 "use client";
 
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, Search } from "lucide-react";
 import Sidebar from "@/components/sidebar/sideBar";
 import ChatItem from "@/components/chat/chatItem";
 import ChatWindow from "@/components/chat/chatWindow";
-import { useScoket } from "@/hooks/useSocket";
-
-interface Message {
-  text : string;
-  sender : string;
-}
 
 
 export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const socket = useScoket();
+  const [contactList, setContactList] = useState({})
+
+
+  const getUserContactList = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/user/contact", {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        console.log("Error with status code", response.status);
+      }
+      const data = await response.json();
+      setContactList(data.contactList);
+      console.log("Contact details extracted");
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   useEffect(() => {
-    socket.on("receive_message", (data: Message) => {
-      console.log(data)
-      // setMessages((prev) => [...prev, data]);
-    });
-
-    return () => {
-      socket.off("receive_message");
-    };
-  }, [socket]);
-
-  const sendMessage = () => {
-    if (!message.trim()) return;
-
-    const msgData = {
-      text: message,
-      sender: "User",
-    };
-
-    socket.emit("send_message", msgData);
-    setMessages((prev) => [...prev, msgData]);
-    setMessage("");
-  };
-  
-
+    getUserContactList();
+  }, [])
 
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-gray-100">
@@ -60,7 +51,7 @@ export default function ChatPage() {
           >{isSidebarOpen ? null :
 
             <Menu className="w-6 h-6 text-emerald-600" />
-          }
+            }
           </button>
         </div>
 
@@ -78,19 +69,24 @@ export default function ChatPage() {
 
         {/* List */}
         <div className="flex-1 overflow-y-auto">
-         
+          {contactList.length === 0 ? null : (
+            contactList.map((user) => (
+              <ChatItem key={user._id} name={user.username} />
+            ))
+          )
+          }
         </div>
       </div>
 
       {/* Chat Window or Placeholder */}
       <div className="flex-1">
-          <ChatWindow
-            user={{
-              name: "Kunal Deshmukh",
-              initials: "Hi",
-              status: "Online",
-            }}
-          />
+        <ChatWindow
+          user={{
+            name: "Kunal Deshmukh",
+            initials: "Hi",
+            status: "Online",
+          }}
+        />
       </div>
 
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />

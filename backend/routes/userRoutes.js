@@ -1,9 +1,10 @@
 const router = require("express").Router();
-const {getUserInfo} = require("../controllers/userControllers");
-const authMiddleware = require("../middleware/authMiddleware");
+const {getUserInfo,getContactDetails} = require("../controllers/userControllers");
+const {authMiddleware} = require("../middleware/authMiddleware");
 
 
-router.get("/profile",getUserInfo);
+router.get("/profile",authMiddleware,getUserInfo);
+router.get("/contact",authMiddleware,getContactDetails);
 
 
 module.exports = router;
